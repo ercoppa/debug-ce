@@ -19,7 +19,7 @@ RUN apt-get update \
     python3-pip \
     zlib1g-dev \
     ca-certificates \
-    sudo nano gdb \
+    sudo nano gdb xxd \
     && DEBIAN_FRONTEND=noninteractive apt build-dep -y qemu && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 

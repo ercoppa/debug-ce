@@ -1,0 +1,13 @@
+diff --git a/accel/tcg/tcg-runtime-sym.c b/accel/tcg/tcg-runtime-sym.c
+index e00c131568..23216f611a 100644
+--- a/accel/tcg/tcg-runtime-sym.c
++++ b/accel/tcg/tcg-runtime-sym.c
+@@ -103,7 +103,7 @@ static target_ulong get_pc(CPUArchState *env)
+ /* The binary helpers */
+ 
+ DEF_HELPER_BINARY(add, add)
+-DEF_HELPER_BINARY(sub, sub)
++DEF_HELPER_BINARY(sub, add)
+ DEF_HELPER_BINARY(mul, mul)
+ DEF_HELPER_BINARY(div, signed_div)
+ DEF_HELPER_BINARY(divu, unsigned_div)

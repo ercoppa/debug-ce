@@ -1,0 +1,13 @@
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 71d5fb273a..ddd966caa1 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7586,7 +7586,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+ #endif
+ #ifdef TARGET_NR_lseek
+     case TARGET_NR_lseek:
+-        return get_errno(lseek64_symbolized(arg1, arg2, arg3));
++        return get_errno(lseek64(arg1, arg2, arg3));
+ #endif
+ #if defined(TARGET_NR_getxpid) && defined(TARGET_ALPHA)
+     /* Alpha specific */
