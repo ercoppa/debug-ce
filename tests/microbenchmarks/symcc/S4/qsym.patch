@@ -1,0 +1,13 @@
+diff --git a/qsym/pintool/codegen/expr_builder.cpp b/qsym/pintool/codegen/expr_builder.cpp
+index f204700..c772f51 100644
+--- a/qsym/pintool/codegen/expr_builder.cpp
++++ b/qsym/pintool/codegen/expr_builder.cpp
+@@ -215,7 +215,7 @@ ExprRef CommutativeExprBuilder::createSub(ExprRef l, ExprRef r)
+ 
+   if (nce_l != NULL && ce_r != NULL) {
+     // X - C_0 = -C_0 + X
+-    return createAdd(createNeg(ce_r), nce_l);
++    return createSub(createNeg(ce_r), nce_l);
+   }
+   else
+     return ExprBuilder::createSub(l, r);

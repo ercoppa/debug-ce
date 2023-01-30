@@ -1,0 +1,32 @@
+diff --git a/compiler/Runtime.cpp b/compiler/Runtime.cpp
+index 66a42dc..5d56cc5 100644
+--- a/compiler/Runtime.cpp
++++ b/compiler/Runtime.cpp
+@@ -168,7 +168,7 @@ bool isInterceptedFunction(const Function &f) {
+   static const StringSet<> kInterceptedFunctions = {
+       "malloc",   "calloc",  "mmap",    "mmap64", "open",   "read",    "lseek",
+       "lseek64",  "fopen",   "fopen64", "fread",  "fseek",  "fseeko",  "rewind",
+-      "fseeko64", "getc",    "ungetc",  "memcpy", "memset", "strncpy", "strchr",
++      "fseeko64", "getc",    "ungetc",  "memcpy", /*"memset", */ "strncpy", "strchr",
+       "memcmp",   "memmove", "ntohl",   "fgets",  "fgetc",  "getchar"};
+ 
+   return (kInterceptedFunctions.count(f.getName()) > 0);
+diff --git a/compiler/Symbolizer.cpp b/compiler/Symbolizer.cpp
+index 40932d5..eebf19a 100644
+--- a/compiler/Symbolizer.cpp
++++ b/compiler/Symbolizer.cpp
+@@ -222,12 +222,12 @@ void Symbolizer::handleIntrinsicCall(CallBase &I) {
+     tryAlternative(IRB, I.getOperand(2));
+ 
+     // The comment on memcpy's length parameter applies analogously.
+-
++    /*
+     IRB.CreateCall(runtime.memset,
+                    {I.getOperand(0),
+                     getSymbolicExpressionOrNull(I.getOperand(1)),
+                     IRB.CreateZExtOrTrunc(I.getOperand(2), intPtrType)});
+-
++    */
+ #if DEBUG_CONSISTENCY_CHECK
+     addConsistencyCheck(I.getOperand(1), getSymbolicExpressionOrNull(I.getOperand(1)), IRB);
+ #endif

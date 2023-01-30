@@ -1,0 +1,14 @@
+diff --git a/runtime/LibcWrappers.cpp b/runtime/LibcWrappers.cpp
+index 41ce2a3..68d7049 100644
+--- a/runtime/LibcWrappers.cpp
++++ b/runtime/LibcWrappers.cpp
+@@ -495,7 +495,8 @@ uint32_t SYM(ntohl)(uint32_t netlong) {
+   }
+ 
+ #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+-  _sym_set_return_expression(_sym_build_bswap(netlongExpr));
++  /* _sym_set_return_expression(_sym_build_bswap(netlongExpr)); */
++  _sym_set_return_expression(netlongExpr);
+ #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+   _sym_set_return_expression(netlongExpr);
+ #else

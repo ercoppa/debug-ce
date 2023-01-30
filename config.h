@@ -1,0 +1,10 @@
+#ifndef DEBUG_CE_H
+#define DEBUG_CE_H
+
+#define DEBUG_CONSISTENCY_CHECK 1
+#define DEBUG_CHECK_PI_SOLVER   1
+#define DEBUG_CHECK_PI_CONCRETE 1
+#define DEBUG_CHECK_INPUTS      1
+#define DEBUG_SKIP_QUERIES      1
+
+#endif

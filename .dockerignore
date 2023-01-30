@@ -1,0 +1,4 @@
+.vscode
+symcc/build
+Makefile
+tests

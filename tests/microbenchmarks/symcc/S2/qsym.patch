@@ -1,0 +1,38 @@
+diff --git a/qsym/pintool/codegen/expr_builder.cpp b/qsym/pintool/codegen/expr_builder.cpp
+index f204700..17433a9 100644
+--- a/qsym/pintool/codegen/expr_builder.cpp
++++ b/qsym/pintool/codegen/expr_builder.cpp
+@@ -182,6 +182,12 @@ ExprRef BaseExprBuilder::createRead(ADDRINT off) {
+   return cache[off];
+ }
+ 
++ExprRef BaseExprBuilder::createAdd(ExprRef l, ExprRef r) {
++	ExprRef ref = std::make_shared<SubExpr>(l, r);
++	addUses(ref);
++	return ref;
++}
++
+ ExprRef BaseExprBuilder::createExtract(ExprRef e, UINT32 index, UINT32 bits)
+ {
+   if (bits == e->bits())
+diff --git a/qsym/pintool/expr_builder.h b/qsym/pintool/expr_builder.h
+index 9a199af..2ec1623 100644
+--- a/qsym/pintool/expr_builder.h
++++ b/qsym/pintool/expr_builder.h
+@@ -83,7 +83,6 @@ public:
+   ExprRef createZExt(ExprRef e, UINT32 bits) override;
+   ExprRef createSExt(ExprRef e, UINT32 bits) override;
+-  ExprRef createAdd(ExprRef l, ExprRef r) override;
+   ExprRef createSub(ExprRef l, ExprRef r) override;
+   ExprRef createMul(ExprRef l, ExprRef r) override;
+   ExprRef createUDiv(ExprRef l, ExprRef r) override;
+   ExprRef createSDiv(ExprRef l, ExprRef r) override;
+@@ -112,6 +111,8 @@ public:
+   ExprRef createLNot(ExprRef e) override;
+   ExprRef createIte(ExprRef expr_cond, ExprRef expr_true, ExprRef expr_false) override;
+   // {END:BASE}
++
++  ExprRef createAdd(ExprRef l, ExprRef r) override;
+ };
+ 
+ class CacheExprBuilder : public ExprBuilder {

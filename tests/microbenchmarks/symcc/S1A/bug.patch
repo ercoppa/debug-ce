@@ -1,0 +1,13 @@
+diff --git a/compiler/Runtime.cpp b/compiler/Runtime.cpp
+index 66a42dc..223e105 100644
+--- a/compiler/Runtime.cpp
++++ b/compiler/Runtime.cpp
+@@ -86,7 +86,7 @@ Runtime::Runtime(Module &M) {
+       import(M, "_sym_build_" #name, ptrT, ptrT, ptrT);
+ 
+   LOAD_BINARY_OPERATOR_HANDLER(Add, add)
+-  LOAD_BINARY_OPERATOR_HANDLER(Sub, sub)
++  LOAD_BINARY_OPERATOR_HANDLER(Sub, add)
+   LOAD_BINARY_OPERATOR_HANDLER(Mul, mul)
+   LOAD_BINARY_OPERATOR_HANDLER(UDiv, unsigned_div)
+   LOAD_BINARY_OPERATOR_HANDLER(SDiv, signed_div)
