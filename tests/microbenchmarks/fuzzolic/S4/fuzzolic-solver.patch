@@ -1,0 +1,22 @@
+diff --git a/solver/main.c b/solver/main.c
+index 36ef7d9..4d9a75a 100644
+--- a/solver/main.c
++++ b/solver/main.c
+@@ -3033,7 +3033,7 @@ Z3_ast optimize_z3_query(Z3_ast e)
+         }
+         //
+         if (is_zero_const(op2)) {
+-            return op1;
++            return op2;
+         }
+         if (is_const(op2, &value) && value == FF_MASK(SIZE(e))) {
+             return op2;
+@@ -4841,6 +4841,8 @@ Z3_ast smt_query_to_z3(Expr* query, uintptr_t is_const_value, size_t width,
+ 
+ #if DEBUG_EXPR_OPT
+     if (r != orig_r) { // && debug_translation
++        // print_z3_ast(orig_r);
++        // print_z3_ast(r);
+ #if 0
+         if (SIZE(r) != SIZE(orig_r)) {
+             printf("OPT CHECK: size=%u size=%u\n", SIZE(orig_r), SIZE(r));

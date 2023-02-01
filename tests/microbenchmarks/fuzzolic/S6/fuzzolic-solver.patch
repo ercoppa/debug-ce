@@ -1,0 +1,21 @@
+diff --git a/solver/main.c b/solver/main.c
+index 8eda2a9..ee2ed1a 100644
+--- a/solver/main.c
++++ b/solver/main.c
+@@ -5185,7 +5185,7 @@ static void smt_branch_query(Query* q)
+     // SAYF("Translating query %lu to Z3...\n", GET_QUERY_IDX(q));
+     GHashTable* inputs   = NULL;
+     Z3_ast      z3_query = smt_query_to_z3_wrapper(q->query, 0, 0, &inputs);
+-    z3_ast_exprs[GET_QUERY_IDX(q)] = z3_query;
++    // z3_ast_exprs[GET_QUERY_IDX(q)] = z3_query;
+     // SAYF("DONE: Translating query to Z3\n");
+ #if 0
+     if (OP(z3_query) == Z3_OP_FALSE) {
+@@ -5210,6 +5210,7 @@ static void smt_branch_query(Query* q)
+     get_inputs_expr(z3_query);
+ #endif
+     Z3_ast z3_neg_query = Z3_mk_not(smt_solver.ctx, z3_query); // invert branch
++    z3_ast_exprs[GET_QUERY_IDX(q)] = z3_neg_query;
+ 
+ #if 0
+     Z3_set_ast_print_mode(smt_solver.ctx, Z3_PRINT_LOW_LEVEL);

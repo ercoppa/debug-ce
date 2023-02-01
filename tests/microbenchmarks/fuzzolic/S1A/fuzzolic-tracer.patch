@@ -1,0 +1,13 @@
+diff --git a/tcg/symbolic/symbolic.c b/tcg/symbolic/symbolic.c
+index ffad1fd253..95ca2f7132 100644
+--- a/tcg/symbolic/symbolic.c
++++ b/tcg/symbolic/symbolic.c
+@@ -4005,7 +4005,7 @@ static inline OPKIND get_opkind(TCGOpcode opc)
+             return ADD;
+         case INDEX_op_sub_i32:
+         case INDEX_op_sub_i64:
+-            return SUB;
++            return ADD;
+         case INDEX_op_mul_i32:
+         case INDEX_op_mul_i64:
+             return MUL;

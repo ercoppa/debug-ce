@@ -1,0 +1,28 @@
+diff --git a/solver/main.c b/solver/main.c
+index 1aef786..b064e3f 100644
+--- a/solver/main.c
++++ b/solver/main.c
+@@ -3914,6 +3914,7 @@ Z3_ast smt_query_to_z3(Expr* query, uintptr_t is_const_value, size_t width,
+             break;
+         //
+         case ADD:
++        case SUB:
+             op1 = smt_query_to_z3(query->op1, query->op1_is_const, 0,
+                                   &op1_inputs);
+             op2 = smt_query_to_z3(query->op2, query->op2_is_const, 0,
+@@ -3955,6 +3956,7 @@ Z3_ast smt_query_to_z3(Expr* query, uintptr_t is_const_value, size_t width,
+                 r = Z3_mk_bvadd(smt_solver.ctx, op1, op2);
+             }
+             break;
++        /*
+         case SUB:
+             op1 = smt_query_to_z3(query->op1, query->op1_is_const, 0,
+                                   &op1_inputs);
+@@ -3969,6 +3971,7 @@ Z3_ast smt_query_to_z3(Expr* query, uintptr_t is_const_value, size_t width,
+ #endif
+             r = Z3_mk_bvsub(smt_solver.ctx, op1, op2);
+             break;
++        */
+         case MUL:
+         case MULU:
+             op1       = smt_query_to_z3(query->op1, query->op1_is_const, 0,

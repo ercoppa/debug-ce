@@ -1,0 +1,13 @@
+diff --git a/solver/main.c b/solver/main.c
+index 36ef7d9..07e5f60 100644
+--- a/solver/main.c
++++ b/solver/main.c
+@@ -6850,7 +6850,7 @@ static void smt_model_expr(Query* q)
+ 
+         Z3_ast branch = NULL;
+         Z3_ast branch_neg = NULL;
+-        if (res == 0) {
++        if (1 /* res == 0 */) {
+             branch = c;
+             branch_neg = c_neg;
+         } else {

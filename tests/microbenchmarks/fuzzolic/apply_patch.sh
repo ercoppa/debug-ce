@@ -11,6 +11,10 @@ elif [[ ${PATCH} == qsym* ]]; then
     SRC_DIR="/debug-ce/symcc/runtime/qsym_backend/qsym/"
 elif [[ ${PATCH} == symqemu* ]]; then
     SRC_DIR="/debug-ce/symqemu"
+elif [[ ${PATCH} == fuzzolic-tracer* ]]; then
+    SRC_DIR="/debug-ce/fuzzolic/tracer"
+elif [[ ${PATCH} == fuzzolic-solver* ]]; then
+    SRC_DIR="/debug-ce/fuzzolic/"
 else
     echo "Cannot recognize project!"
     exit 1

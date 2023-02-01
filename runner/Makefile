@@ -12,6 +12,8 @@ run:
 		-v `pwd`/../tests:/debug-ce/tests \
 		-v `pwd`/../symcc:/debug-ce/symcc \
 		-v `pwd`/../symqemu:/debug-ce/symqemu \
-		-v `pwd`/../fuzzolic:/debug-ce/fuzzolic \
+		-v `pwd`/../fuzzolic/tracer:/debug-ce/fuzzolic/tracer \
+		-v `pwd`/../fuzzolic/solver:/debug-ce/fuzzolic/solver \
+		-v `pwd`/../fuzzolic/fuzzolic:/debug-ce/fuzzolic/fuzzolic \
 		--name debug-ce-run-`date "+%y%m%d-%H%M"` \
 		ercoppa/debug-ce bash

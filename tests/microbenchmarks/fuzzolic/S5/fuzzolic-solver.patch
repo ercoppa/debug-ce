@@ -1,0 +1,13 @@
+diff --git a/solver/main.c b/solver/main.c
+index 8eda2a9..36e7a8f 100644
+--- a/solver/main.c
++++ b/solver/main.c
+@@ -5209,7 +5209,7 @@ static void smt_branch_query(Query* q)
+ #if 0
+     get_inputs_expr(z3_query);
+ #endif
+-    Z3_ast z3_neg_query = Z3_mk_not(smt_solver.ctx, z3_query); // invert branch
++    Z3_ast z3_neg_query = z3_query; // Z3_mk_not(smt_solver.ctx, z3_query); // invert branch
+ 
+ #if 0
+     Z3_set_ast_print_mode(smt_solver.ctx, Z3_PRINT_LOW_LEVEL);

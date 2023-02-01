@@ -1,0 +1,20 @@
+diff --git a/tcg/symbolic/symbolic.c b/tcg/symbolic/symbolic.c
+index ffad1fd253..7491a50356 100644
+--- a/tcg/symbolic/symbolic.c
++++ b/tcg/symbolic/symbolic.c
+@@ -4822,6 +4822,7 @@ void qemu_syscall_helper(uintptr_t syscall_no, uintptr_t syscall_arg0,
+             break;
+         //
+         case SYS_SEEK:
++            /*
+             fp = syscall_arg0;
+             if (fp >= 0 && ((int)ret_val) >= 0 && input_fp[fp]) {
+                 off_t offset = syscall_arg1;
+@@ -4840,6 +4841,7 @@ void qemu_syscall_helper(uintptr_t syscall_no, uintptr_t syscall_arg0,
+                         tcg_abort();
+                 }
+             }
++            */
+             break;
+         //
+         case SYS_READ:

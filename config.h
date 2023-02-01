@@ -6,5 +6,6 @@
 #define DEBUG_CHECK_PI_CONCRETE 1
 #define DEBUG_CHECK_INPUTS      1
 #define DEBUG_SKIP_QUERIES      1
+#define DEBUG_CHECK_EXPR_OPTS   1
 
 #endif

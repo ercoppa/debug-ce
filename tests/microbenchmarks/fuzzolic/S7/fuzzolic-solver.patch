@@ -1,0 +1,13 @@
+diff --git a/solver/main.c b/solver/main.c
+index 8eda2a9..01a45ce 100644
+--- a/solver/main.c
++++ b/solver/main.c
+@@ -3989,7 +3989,7 @@ Z3_ast smt_query_to_z3(Expr* query, uintptr_t is_const_value, size_t width,
+             smt_print_ast_sort(op1);
+             smt_print_ast_sort(op2);
+ #endif
+-            r = Z3_mk_bvsub(smt_solver.ctx, op1, op2);
++            r = Z3_mk_bvadd(smt_solver.ctx, op1, op2);
+             break;
+         case MUL:
+         case MULU:
