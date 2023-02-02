@@ -7,7 +7,7 @@
 int main(int argc, char* argv[]) {
     if (argc == 1) return -1;
     int fd = open(argv[1], O_RDONLY);
-    char value;
+    int value;
     int res = read(fd, &value, sizeof(value));
     
     if (value == 0xBD)

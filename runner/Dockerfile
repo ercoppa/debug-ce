@@ -61,8 +61,20 @@ RUN mkdir /debug-ce/z3/build
 WORKDIR /debug-ce/z3/build
 RUN cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=`pwd`/dist && make -j `nproc` && make install
 
-# Build SymCC
+# Build SymCC (simple backend)
 COPY --chown=ubuntu:ubuntu symcc /debug-ce/symcc/ 
+RUN sudo rm -rf /debug-ce/symcc/build-simple || echo "Nothing to remove" 
+RUN mkdir /debug-ce/symcc/build-simple
+WORKDIR /debug-ce/symcc/build-simple
+RUN cmake -G Ninja \
+    -DQSYM_BACKEND=OFF \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DZ3_DIR=/debug-ce/z3/build/dist/lib/cmake/z3 \
+    -DLLVM_DIR=`llvm-config-10 --cmakedir` \
+    /debug-ce/symcc \
+    && ninja
+
+# Build SymCC (QSYM backend)
 RUN sudo rm -rf /debug-ce/symcc/build || echo "Nothing to remove" 
 RUN mkdir /debug-ce/symcc/build
 WORKDIR /debug-ce/symcc/build
