@@ -1,0 +1,8 @@
+{
+    "binary" : "bsdtar",
+    "args" : "tf @@",
+    "seed" : "seeds/tar.tar",
+    "seed_dir" : "seeds",
+    "symcc_bin" : "bsdtar_symcc",
+    "build_dir" : "libarchive/inst"
+}

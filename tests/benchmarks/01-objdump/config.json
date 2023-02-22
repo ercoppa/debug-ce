@@ -1,0 +1,5 @@
+{
+    "binary" : "objdump",
+    "args" : "-d @@",
+    "seed" : "small_exec.elf"
+}

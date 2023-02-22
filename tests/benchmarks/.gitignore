@@ -1,0 +1,8 @@
+build*
+libpcap-1.9.1
+*.fuzzolic
+*.symcc
+*.symqemu
+src*
+seeds
+workdir

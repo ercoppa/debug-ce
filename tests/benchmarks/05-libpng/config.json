@@ -1,0 +1,7 @@
+{
+    "binary" : "libpng",
+    "args" : "@@ /dev/null",
+    "seed" : "seeds/not_kitty.png",
+    "seed_dir" : "seeds",
+    "dict" : "../../dicts/png.dict"
+}

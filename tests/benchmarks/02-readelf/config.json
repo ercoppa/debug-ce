@@ -1,0 +1,6 @@
+{
+    "binary" : "readelf",
+    "args" : "-a @@",
+    "seed" : "seeds/small_exec.elf",
+    "seed_dir" : "seeds",
+}
