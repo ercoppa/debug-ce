@@ -5,4 +5,5 @@ libpcap-1.9.1
 *.symqemu
 src*
 seeds
-workdir
+workdir*
+out.log

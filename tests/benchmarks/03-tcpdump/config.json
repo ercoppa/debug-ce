@@ -1,7 +1,6 @@
 {
     "binary" : "tcpdump",
     "args" : "-e -vv -nr @@",
-    "seed" : "seeds/small_capture.pcap",
-    "seed_dir" : "seeds",
-    "symcc_bin" : "tcpdump_symcc"
+    "seed" : "small_capture.pcap",
+    "seed_dir" : "seeds"
 }

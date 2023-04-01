@@ -1,0 +1,5 @@
+{
+    "binary" : "tiff2pdf",
+    "args" : "@@",
+    "seed" : "seeds/not_kitty.tiff"
+}

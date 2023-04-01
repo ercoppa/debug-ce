@@ -22,7 +22,7 @@ void abort_(const char * s, ...)
         vfprintf(stderr, s, args);
         fprintf(stderr, "\n");
         va_end(args);
-        abort();
+        exit(1);
 }
 
 int x, y;
