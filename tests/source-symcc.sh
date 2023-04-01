@@ -1,2 +1,2 @@
-export CC=/debug-ce/symcc/build/symcc
-export CXX=/debug-ce/symcc/build/sym++
+export CC=/debug-ce/symcc/build-simple/symcc
+export CXX=/debug-ce/symcc/build-simple/sym++
