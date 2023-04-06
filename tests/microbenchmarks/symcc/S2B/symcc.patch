@@ -1,0 +1,13 @@
+diff --git a/compiler/Symbolizer.cpp b/compiler/Symbolizer.cpp
+index 40932d5..bfee5fe 100644
+--- a/compiler/Symbolizer.cpp
++++ b/compiler/Symbolizer.cpp
+@@ -800,7 +800,7 @@ void Symbolizer::visitCastInst(CastInst &I) {
+ 
+   switch (I.getOpcode()) {
+   case Instruction::SExt:
+-    target = runtime.buildSExt;
++    target = runtime.buildZExt;
+     break;
+   case Instruction::ZExt:
+     target = runtime.buildZExt;
