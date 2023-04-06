@@ -20,6 +20,7 @@ RUN apt-get update \
     zlib1g-dev \
     ca-certificates \
     sudo nano gdb xxd \
+    bison flex \
     && DEBIAN_FRONTEND=noninteractive apt build-dep -y qemu && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
@@ -122,6 +123,26 @@ RUN ./configure                                                     \
     --symcc-source=/debug-ce/symcc/                                 \
     --symcc-build=/debug-ce/symcc/build &&                          \
     make -j `nproc`
+# build symhelpers
+COPY --chown=ubuntu:ubuntu symhelpers /debug-ce/symhelpers/
+RUN sudo rm -rf /debug-ce/symhelpers/*.so || echo "Nothing to remove" 
+WORKDIR /debug-ce/symhelpers/
+RUN if [ "$ENV" = "symhelpers" ] ; then ./build.sh
+# rebuild SymQEMU with symhelpers
+RUN if [ "$ENV" = "symhelpers" ] ; then ./configure                \
+    --audio-drv-list=                                               \
+    --disable-bluez                                                 \
+    --disable-sdl                                                   \
+    --disable-gtk                                                   \
+    --disable-vte                                                   \
+    --disable-opengl                                                \
+    --disable-virglrenderer                                         \
+    --disable-werror                                                \
+    --target-list=x86_64-linux-user                                 \
+    --enable-capstone=git                                           \
+    --symcc-source=/debug-ce/symcc/                                 \
+    --symcc-build=/debug-ce/symcc/build &&                          \
+    make -j `nproc`
 
 # Build Fuzzolic
 RUN mv /debug-ce/fuzzolic /debug-ce/fuzzolic.afl
@@ -138,6 +159,5 @@ ENV LIBRARY_PATH=/debug-ce/fuzzolic/solver/fuzzy-sat/fuzzolic-z3/build/dist/lib
 ENV LD_LIBRARY_PATH=/debug-ce/fuzzolic/solver/fuzzy-sat/fuzzolic-z3/build/dist/lib
 RUN cd solver/fuzzy-sat && make -j `nproc`
 RUN cd solver && cmake . && make -j `nproc`
-
 
 WORKDIR /debug-ce/

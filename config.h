@@ -7,5 +7,22 @@
 #define DEBUG_CHECK_INPUTS      1
 #define DEBUG_SKIP_QUERIES      1
 #define DEBUG_CHECK_EXPR_OPTS   1
+#define DEBUG_FUZZ_EXPRS        1
+#define DEBUG_FUZZ_EXPRS_N      16 // 16
+
+#define SYMCC_FIX_ISSUE_108     0
+#define SYMCC_FIX_ISSUE_109     0
+#define SYMCC_FIX_ISSUE_112     0
+#define SYMCC_FIX_ISSUE_INPUT   0
+#define SYMCC_FIX_ISSUE_SPRINTF 0
+#define SYMCC_FIX_VARIADIC      0
+
+#define SYMQEMU_DBG_INSN        0
+
+#define SYMQEMU_FIX_PC          0
+#define SYMQEMU_FIX_MULUH       0
+#define SYMQEMU_FIX_CTZ_CLZ     0
+#define SYMQEMU_FIX_LOAD_SEXT   0
+#define SYMQEMU_FIX_SETCOND     0
 
 #endif
