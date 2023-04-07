@@ -1,0 +1,13 @@
+diff --git a/qsym/pintool/expr.h b/qsym/pintool/expr.h
+index 9539dcf..80aaa30 100644
+--- a/qsym/pintool/expr.h
++++ b/qsym/pintool/expr.h
+@@ -1100,7 +1100,7 @@ protected:
+   }
+ 
+   z3::expr toZ3ExprRecursively(bool verbose) override {
+-    return children_[0]->toZ3Expr(verbose) > children_[1]->toZ3Expr(verbose);
++    return children_[0]->toZ3Expr(verbose) < children_[1]->toZ3Expr(verbose);
+   }
+ };
+ 

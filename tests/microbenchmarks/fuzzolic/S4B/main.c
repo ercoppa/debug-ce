@@ -9,8 +9,8 @@ int main(int argc, char* argv[]) {
     int fd = open(argv[1], O_RDONLY);
     char value;
     int res = read(fd, &value, sizeof(value));
-    
-    if (value - 0xBD > 1)
+
+    if (value - 0xB == 0)
         printf("OK\n");
     else
         printf("KO\n");

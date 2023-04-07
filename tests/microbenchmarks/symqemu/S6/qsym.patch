@@ -1,40 +1,32 @@
 diff --git a/qsym/pintool/solver.cpp b/qsym/pintool/solver.cpp
-index bb03abb..70e30e5 100644
+index 921f506..7b17e92 100644
 --- a/qsym/pintool/solver.cpp
 +++ b/qsym/pintool/solver.cpp
-@@ -184,7 +184,9 @@ void Solver::addJcc(ExprRef e, bool taken, ADDRINT pc) {
+@@ -236,15 +236,15 @@ void Solver::addJcc(ExprRef e, bool taken, ADDRINT pc) {
+     if (debug_count == check_input_count) {
+       if (debug_hash == check_input_hash) {
+         if (debug_taken != check_input_taken) {
+-          printf("Input is taking the expected direction!\n");
++          fprintf(stderr, "Input is taking the expected direction!\n");
+           exit(0);
+         } else {
+-          printf("Input is divergent: it reaches the same branch but does not take the expected direction!\n");
++          fprintf(stderr, "Input is divergent: it reaches the same branch but does not take the expected direction!\n");
+           if (debug_abort) abort();
+           else exit(0);
+         }
+       } else {
+-        printf("Input is divergent: it does take the same path! [hash is different: %x vs expected=%x]\n", debug_hash, check_input_hash);
++        fprintf(stderr, "Input is divergent: it does take the same path! [hash is different: %x vs expected=%x]\n", debug_hash, check_input_hash);
+         if (debug_abort) abort();
+         else exit(0);
+       }
+@@ -270,7 +270,7 @@ void Solver::addJcc(ExprRef e, bool taken, ADDRINT pc) {
  
    if (is_interesting)
      negatePath(e, taken);
 -  addConstraint(e, taken, is_interesting);
 +  addConstraint(e, /* taken */ true, is_interesting);
-+
-+  printf("CONSTRAINT: %s%s\n", taken ? "" : "!", e->toString().c_str());
  
- #if DEBUG_CHECK_PI_SOLVER
-   reset();
-@@ -551,6 +553,7 @@ void Solver::negatePath(ExprRef e, bool taken) {
-   reset();
-   syncConstraints(e);
-   addToSolver(e, !taken);
-+  printf("CONSTRAINT: %s\n", e->toString().c_str());
-   bool sat = checkAndSave();
-   if (!sat) {
-     reset();
-@@ -598,7 +601,7 @@ int Solver::checkConsistencySMT(Z3_ast e, uint64_t expected_value) {
-     // printf("Model:\n%s\n", Z3_model_to_string(context_, m));
-   }
- 
--  // printf("EXPR: %s\n", Z3_ast_to_string(context_, e));
-+  printf("EXPR: %s\n", Z3_ast_to_string(context_, e));
- 
-   uint64_t  value;
-   Z3_ast    solution;
-@@ -621,6 +624,7 @@ int Solver::checkConsistencySMT(Z3_ast e, uint64_t expected_value) {
-   } else {
- 
-     Z3_lbool res = Z3_get_bool_value(context_, solution);
-+    printf("BOOL: %d\n", res);
-     if (res == Z3_L_TRUE) {
-       value = 1;
-       if (value != expected_value) {
+ #if DEBUG_CHECK_PI_SOLVER || DEBUG_CHECK_PI_CONCRETE
+   static int check_pi = -1;

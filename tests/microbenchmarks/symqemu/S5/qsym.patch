@@ -1,8 +1,8 @@
 diff --git a/qsym/pintool/solver.cpp b/qsym/pintool/solver.cpp
-index f51fc3d..6aced07 100644
+index 921f506..dba6180 100644
 --- a/qsym/pintool/solver.cpp
 +++ b/qsym/pintool/solver.cpp
-@@ -259,7 +259,7 @@ void Solver::addJcc(ExprRef e, bool taken, ADDRINT pc) {
+@@ -269,7 +269,7 @@ void Solver::addJcc(ExprRef e, bool taken, ADDRINT pc) {
  #endif
  
    if (is_interesting)
@@ -10,4 +10,4 @@ index f51fc3d..6aced07 100644
 +    negatePath(e, !taken);
    addConstraint(e, taken, is_interesting);
  
- #if DEBUG_CHECK_PI_SOLVER
+ #if DEBUG_CHECK_PI_SOLVER || DEBUG_CHECK_PI_CONCRETE

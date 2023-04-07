@@ -1,0 +1,13 @@
+diff --git a/solver/main.c b/solver/main.c
+index 7e9ff0b..f8ea217 100644
+--- a/solver/main.c
++++ b/solver/main.c
+@@ -2399,7 +2399,7 @@ Z3_ast optimize_z3_query(Z3_ast e)
+             return optimize_z3_query(e);
+         } else if (decl_kind == Z3_OP_EQ &&
+             is_zero_const(op2) && OP(op1) == Z3_OP_BSUB) {
+-            e = get_make_op(decl_kind)(ctx, ARG1(op1), ARG2(op1));
++            e = get_make_op(decl_kind)(ctx, ARG1(op1), op2);
+             return optimize_z3_query(e);
+         }
+ 

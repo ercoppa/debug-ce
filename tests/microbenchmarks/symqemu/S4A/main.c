@@ -9,13 +9,11 @@ int main(int argc, char* argv[]) {
     int fd = open(argv[1], O_RDONLY);
     char value;
     int res = read(fd, &value, sizeof(value));
-
-    int f = value + 1 < 0xB;
-    if (f)
+    
+    if (value > 0xBD)
         printf("OK\n");
     else
         printf("KO\n");
-    printf("%d\n", f);
-
+    // printf("Value: %d\n", value);
     return 0;
 }
