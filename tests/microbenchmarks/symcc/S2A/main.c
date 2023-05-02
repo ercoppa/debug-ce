@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
     char value;
     int res = read(fd, &value, sizeof(value));
     
-    if (value - 0xBD > 1)
+    if (value - 0xB > 1)
         printf("OK\n");
     else
         printf("KO\n");

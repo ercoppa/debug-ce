@@ -33,18 +33,28 @@ def wait_process(p, log):
             sys.stdout.write(data)
             offset += len(data)
 
-def run(tool, program, config, run_dir, check_expr=None, fuzz_expr=None, check_opt=None, check_pi=None, check_inputs=None, abort_on_inconsistency=False, count=False, timeout=90, rebuild=True, use_gdb=False):
+def run(tool, program, config, run_dir, check_expr=None, fuzz_expr=None, check_opt=None, check_pi=None, check_inputs=None, abort_on_inconsistency=False, count=False, timeout=90, rebuild=True, use_gdb=False, scenario=None):
     
-    if rebuild:
+    if scenario not in ['real', 'simple']:
+        print("Invalid scenario")
+        sys.exit(1)
+
+    if scenario == 'simple':
+        program_dir = "%s/microbenchmarks/%s/%s/" % (SCRIPT_DIR, tool, program)
+        apply_patch(program_dir, tool)
+    else:
+        program_dir = "%s/benchmarks/%s/%s/" % (SCRIPT_DIR, tool, program)
+
+    if rebuild or scenario == 'simple':
         if tool == 'symcc':
-            res = os.system("cd %s/%s && ninja" % (SCRIPT_DIR, "../../symcc/build-simple/"))
+            res = os.system("cd %s/%s && ninja" % (SCRIPT_DIR, "../symcc/build-simple/"))
         elif tool == 'symqemu':
-            res_solver = os.system("cd %s/%s && ninja" % (SCRIPT_DIR, "../../symcc/build/"))
-            res_tracer = os.system("cd %s/%s && make" % (SCRIPT_DIR, "../../symqemu/"))
+            res_solver = os.system("cd %s/%s && ninja" % (SCRIPT_DIR, "../symcc/build/"))
+            res_tracer = os.system("cd %s/%s && make" % (SCRIPT_DIR, "../symqemu/"))
             res = res_tracer + res_solver
         elif tool == 'fuzzolic':
-            res_tracer = os.system("cd %s/%s && make" % (SCRIPT_DIR, "../../fuzzolic/tracer/"))
-            res_solver = os.system("cd %s/%s && make" % (SCRIPT_DIR, "../../fuzzolic/solver"))
+            res_tracer = os.system("cd %s/%s && make" % (SCRIPT_DIR, "../fuzzolic/tracer/"))
+            res_solver = os.system("cd %s/%s && make" % (SCRIPT_DIR, "../fuzzolic/solver"))
             res = res_tracer + res_solver
         else:
             assert False
@@ -52,8 +62,20 @@ def run(tool, program, config, run_dir, check_expr=None, fuzz_expr=None, check_o
             print("Error when building %s" % tool)
             sys.exit(1)
 
-    seed = "%s/%s/%s" % (SCRIPT_DIR, program, config['seed'])
-    exe = "%s/%s/%s.%s" % (SCRIPT_DIR, program, config['binary'], tool)
+    if scenario == 'simple':
+
+        if tool == 'symcc':
+            os.system("cd %s && %s/%s/symcc -o main.%s main.c" % (program_dir, SCRIPT_DIR, "../symcc/build-simple/", tool))
+        elif tool == 'symqemu' or tool == 'fuzzolic':
+            os.system("cd %s && clang-10 -o main.%s main.c" % (program_dir, tool))
+        else:
+            assert False
+
+        seed = "%s/microbenchmarks/%s/%s/input.dat" % (SCRIPT_DIR, tool, program)
+        exe = "%s/microbenchmarks/%s/%s/main.%s" % (SCRIPT_DIR, tool, program, tool)
+    else:
+        seed = "%s/benchmarks/%s/%s" % (SCRIPT_DIR, program, config['seed'])
+        exe = "%s/benchmarks/%s/%s.%s" % (SCRIPT_DIR, program, config['binary'], tool)
 
     env = os.environ.copy()
 
@@ -100,17 +122,20 @@ def run(tool, program, config, run_dir, check_expr=None, fuzz_expr=None, check_o
             p_args += [ 'gdb', '-args' ]
 
         if tool == 'symqemu':
-            p_args += [ SCRIPT_DIR + "/../../symqemu/x86_64-linux-user/symqemu-x86_64" ]
+            p_args += [ SCRIPT_DIR + "/../symqemu/x86_64-linux-user/symqemu-x86_64" ]
             if use_gdb:
-                # p_args += [ '-d', 'in_asm,op_opt' ]
+                p_args += [ '-d', 'in_asm,op_opt' ]
                 pass
 
         p_args += [ exe ]
-        p_args += config['args'].replace("@@", seed).split(" ")
+        if scenario == 'simple':
+            p_args += [seed]
+        else:
+            p_args += config['args'].replace("@@", seed).split(" ")
 
     elif tool == 'fuzzolic':
         p_args = [
-            SCRIPT_DIR + "/../../fuzzolic/fuzzolic/fuzzolic.py",
+            SCRIPT_DIR + "/../fuzzolic/fuzzolic/fuzzolic.py",
             '-i', seed,
             '-o', run_dir + "/dump" if fuzz_expr or check_inputs else run_dir,
             '-d', 'out', #'gdb_solver',
@@ -119,12 +144,15 @@ def run(tool, program, config, run_dir, check_expr=None, fuzz_expr=None, check_o
             '--',
             exe
         ]
-        p_args += config['args'].split(" ")
+        if scenario == 'simple':
+            p_args += ["@@"]
+        else:
+            p_args += config['args'].split(" ")
     else:
         assert False
 
     # print(env)
-    print(' '.join(p_args))
+    print('Command: %s' % ' '.join(p_args))
 
     out_log = None
     log = None
@@ -155,51 +183,60 @@ def run(tool, program, config, run_dir, check_expr=None, fuzz_expr=None, check_o
     if count:
         if check_expr:
             # total checks
-            m = subprocess.check_output(['grep', '-a', 'CHECK_EXPR', log])
-            m = m.decode('unicode_escape')
-            n = (len(m.split("\n")) - 1)
-            print("CHECKS: %d" % n)
-            # success
-            m = subprocess.check_output(['grep', '-a', 'CHECK_EXPR: SUCCESS', log])
-            m = m.decode('unicode_escape')
-            n_ok = (len(m.split("\n")) - 1)
-            print("SUCCESS: %d" % n_ok)
-            print("FAILURE: %d" % (n - n_ok))
-            # os.system("cp %s %s" % (log, run_dir + "/out.log"))
-        if check_opt:
-            # total checks
-            m = subprocess.check_output(['grep', '-a', 'CHECKING OPT %s:' % ("EVAL" if check_opt == 'eval' else 'SMT'), log])
-            m = m.decode('ascii')
-            n = (len(m.split("\n")) - 1)
-            print("CHECKS: %d" % n)
-            # success
-            m = subprocess.check_output(['grep', '-a', 'CHECKING OPT %s: OK' % ("EVAL" if check_opt == 'eval' else 'SMT'), log])
-            m = m.decode('ascii')
-            n_ok = (len(m.split("\n")) - 1)
-            print("SUCCESS: %d" % n_ok)
-            print("FAILURE: %d" % (n - n_ok))
-        if check_pi:
-            # total checks
-            m = subprocess.check_output(['grep', '-a', 'CHECKING PI %s:' % ("EVAL" if check_pi == 'eval' else 'SMT'), log])
-            m = m.decode('ascii')
-            n = (len(m.split("\n")) - 1)
-            print("CHECKS: %d" % n)
-            # success
-            m = subprocess.check_output(['grep', '-a', 'CHECKING PI %s: OK' % ("EVAL" if check_pi == 'eval' else 'SMT'), log])
-            m = m.decode('ascii')
-            n_ok = (len(m.split("\n")) - 1)
-            print("SUCCESS: %d" % n_ok)
-            print("FAILURE: %d" % (n - n_ok))
-
-            # QSYM specific
-            n_qsym_ko = 0
             try:
-                m = subprocess.check_output(['grep', '-a', 'syncConstraints: Incorrect constraints are inserted', log])
-                m = m.decode('ascii')
-                n_qsym_ko = (len(m.split("\n")) - 1)
+                m = subprocess.check_output(['grep', '-a', 'CHECK_EXPR', log])
+                m = m.decode('unicode_escape')
+                n = (len(m.split("\n")) - 1)
+                print("CHECKS: %d" % n)
+                # success
+                m = subprocess.check_output(['grep', '-a', 'CHECK_EXPR: SUCCESS', log])
+                m = m.decode('unicode_escape')
+                n_ok = (len(m.split("\n")) - 1)
+                print("SUCCESS: %d" % n_ok)
+                print("FAILURE: %d" % (n - n_ok))
+                # os.system("cp %s %s" % (log, run_dir + "/out.log"))
             except:
                 pass
-            print("QSYM FAILURE: %d" % n_qsym_ko)
+        if check_opt:
+            try:
+                # total checks
+                m = subprocess.check_output(['grep', '-a', 'CHECKING OPT %s:' % ("EVAL" if check_opt == 'eval' else 'SMT'), log])
+                m = m.decode('ascii')
+                n = (len(m.split("\n")) - 1)
+                print("CHECKS: %d" % n)
+                # success
+                m = subprocess.check_output(['grep', '-a', 'CHECKING OPT %s: OK' % ("EVAL" if check_opt == 'eval' else 'SMT'), log])
+                m = m.decode('ascii')
+                n_ok = (len(m.split("\n")) - 1)
+                print("SUCCESS: %d" % n_ok)
+                print("FAILURE: %d" % (n - n_ok))
+            except:
+                pass
+        if check_pi:
+            try:
+                # total checks
+                m = subprocess.check_output(['grep', '-a', 'CHECKING PI %s:' % ("EVAL" if check_pi == 'eval' else 'SMT'), log])
+                m = m.decode('ascii')
+                n = (len(m.split("\n")) - 1)
+                print("CHECKS: %d" % n)
+                # success
+                m = subprocess.check_output(['grep', '-a', 'CHECKING PI %s: OK' % ("EVAL" if check_pi == 'eval' else 'SMT'), log])
+                m = m.decode('ascii')
+                n_ok = (len(m.split("\n")) - 1)
+                print("SUCCESS: %d" % n_ok)
+                print("FAILURE: %d" % (n - n_ok))
+
+                # QSYM specific
+                n_qsym_ko = 0
+                try:
+                    m = subprocess.check_output(['grep', '-a', 'syncConstraints: Incorrect constraints are inserted', log])
+                    m = m.decode('ascii')
+                    n_qsym_ko = (len(m.split("\n")) - 1)
+                except:
+                    pass
+                print("QSYM FAILURE: %d" % n_qsym_ko)
+            except:
+                pass
 
     
     if out_log:
@@ -208,6 +245,8 @@ def run(tool, program, config, run_dir, check_expr=None, fuzz_expr=None, check_o
     if p.returncode == -11 or p.returncode == -6 or p.returncode == 245:
         print("ABORT DETECTED\n")
         if not(fuzz_expr or check_inputs) and abort_on_inconsistency:
+            if scenario == 'simple':
+                apply_patch(program_dir, tool, revert=True)
             sys.exit(1)
 
     if fuzz_expr or check_inputs:
@@ -258,20 +297,26 @@ def run(tool, program, config, run_dir, check_expr=None, fuzz_expr=None, check_o
 
             if tool in ['symcc', 'symqemu']:
                 if tool == 'symqemu':
-                    p_args += [ SCRIPT_DIR + "/../../symqemu/x86_64-linux-user/symqemu-x86_64" ]
+                    p_args += [ SCRIPT_DIR + "/../symqemu/x86_64-linux-user/symqemu-x86_64" ]
             
                 p_args += [ exe ]
-                p_args += config['args'].replace("@@", seed).split(" ")
+                if scenario == 'simple':
+                    p_args += [seed]
+                else:
+                    p_args += config['args'].replace("@@", seed).split(" ")
             else:
                 p_args = [
-                    SCRIPT_DIR + "/../../fuzzolic/fuzzolic/fuzzolic.py",
+                    SCRIPT_DIR + "/../fuzzolic/fuzzolic/fuzzolic.py",
                     '-i', seed,
                     '-o', run_dir,
                     '-d', 'out',
                     '-k', '-l', '--',
                     exe
                 ]
-                p_args += config['args'].split(" ")
+                if scenario == 'simple':
+                    p_args += ["@@"]
+                else:
+                    p_args += config['args'].split(" ")
 
             # print(p_args)
 
@@ -322,9 +367,12 @@ def run(tool, program, config, run_dir, check_expr=None, fuzz_expr=None, check_o
             if out_log:
                 out_log.close()
 
-            if p.returncode == -11 or p.returncode == -6 or p.returncode == 245:
+            if p.returncode == -11 or p.returncode == -6 or p.returncode == 245 or p.returncode == 66:
                 print("Inconstency detected!")
                 if abort_on_inconsistency:
+                    if scenario == 'simple':
+                        apply_patch(program_dir, tool, revert=True)
+                    print("\nABORT DETECTED")
                     sys.exit(1)
             else:
                 if abort_on_inconsistency:
@@ -341,13 +389,33 @@ def run(tool, program, config, run_dir, check_expr=None, fuzz_expr=None, check_o
                 print("UNKNOWN: %d" % n_unknown)
                 print("FAILURE: %d" % (n - n_ok - n_unknown))
 
+    if scenario == 'simple':
+        apply_patch(program_dir, tool, revert=True)    
+
+
+def apply_patch(program_dir, tool, revert=False):
+    patches = glob.glob("%s/*.patch" % (program_dir,))
+    for patch in patches:
+        target = os.path.basename(patch).replace(".patch", "")
+        if target == 'symcc':
+            src_dir = SCRIPT_DIR + "/../symcc/"
+        elif target == 'symqemu':
+            src_dir = SCRIPT_DIR + "/../symqemu/"
+        elif target == 'qsym':
+            src_dir = SCRIPT_DIR + "/../symcc/runtime/qsym_backend/qsym/"
+        elif target == 'fuzzolic-tracer':
+            src_dir = SCRIPT_DIR + "/../fuzzolic/tracer/"
+        elif target == 'fuzzolic-solver':
+            src_dir = SCRIPT_DIR + "/../fuzzolic/"
+        else:
+            assert False
+
+        print("\n%sing the patch on %s...\n" % (("Revert" if revert else "Apply"), target))
+        os.system("cd %s && git apply %s%s 2>&1 && echo DONE" % (src_dir, (" -R " if revert else ""), patch))
+        print("\n")
+
 
 def main():
-
-    programs = []
-    for p in sorted(glob.glob(SCRIPT_DIR + "/0*")):
-        p = os.path.basename(p)
-        programs.append(p)
 
     parser = argparse.ArgumentParser(
         description='Run benchmarks for debug-ce')
@@ -413,25 +481,51 @@ def main():
         required=True, 
         choices=['symcc', 'symqemu', 'fuzzolic'])
 
+    parser.add_argument(
+        '-s', '--scenario', 
+        help='Simpliefied programs or real-world programs', 
+        required=True, 
+        choices=['simple', 'real'])
+
     # positional args
     parser.add_argument('program', metavar='<program>',
-                        type=str, help='Program to run during the experiment',
-                        choices=programs)
+                        type=str, help='Program to run during the experiment')
 
     args = parser.parse_args()
 
-    config_file = "%s/%s/config.json" % (SCRIPT_DIR, args.program)
-    if not os.path.exists(config_file):
-        print("Missing config file for %s" % args.program)
-        sys.exit(1)
-
     config = {}
-    with open(config_file, "r") as fp:
-        config = json.loads(fp.read())
-    
-    assert 'binary' in config
-    assert 'args' in config
-    assert 'seed' in config
+    if args.scenario == 'real':
+        
+        programs = []
+        for p in sorted(glob.glob(SCRIPT_DIR + "/benchmarks/0*")):
+            p = os.path.basename(p)
+            programs.append(p)
+
+        if args.program not in programs:
+            print("Programs can be: %s" % programs)
+            sys.exit(1)
+
+        config_file = "%s/benchmarks/%s/config.json" % (SCRIPT_DIR, args.program)
+        if not os.path.exists(config_file):
+            print("Missing config file for %s" % args.program)
+            sys.exit(1)
+
+        with open(config_file, "r") as fp:
+            config = json.loads(fp.read())
+        
+        assert 'binary' in config
+        assert 'args' in config
+        assert 'seed' in config
+
+    elif args.scenario == 'simple':
+        programs = []
+        for p in sorted(glob.glob(SCRIPT_DIR + "/microbenchmarks/%s/S*" % args.tool)):
+            p = os.path.basename(p)
+            programs.append(p)
+
+        if args.program not in programs:
+            print("Programs can be: %s" % programs)
+            sys.exit(1)        
 
     print("Running %s with %s..." % (args.tool, args.program))
 
@@ -451,7 +545,10 @@ def main():
 
     if args.tool in ['symcc', 'symqemu', 'fuzzolic']:
         f = False if args.cont else True
-        run(args.tool, args.program, config, work_dir, check_expr=args.expr, fuzz_expr=args.fuzz, check_opt=args.opt, check_pi=args.path, check_inputs=args.input, abort_on_inconsistency=f, count=args.count, rebuild=args.build, use_gdb=args.gdb)
+        run(args.tool, args.program, config, work_dir, check_expr=args.expr, 
+            fuzz_expr=args.fuzz, check_opt=args.opt, check_pi=args.path, 
+            check_inputs=args.input, abort_on_inconsistency=f, count=args.count, 
+            rebuild=args.build, use_gdb=args.gdb, scenario=args.scenario)
     else:
         print("Not yet implemented: %s" % args.tool)
         sys.exit(1)

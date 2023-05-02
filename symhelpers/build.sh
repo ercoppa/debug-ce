@@ -5,7 +5,7 @@ SCRIPTPATH=`dirname $SCRIPT`
 
 export PATH="$SCRIPTPATH/../symcc/build/:${PATH}"
 
-clang -c wrappers.c -O1 -fPIC \
+clang-10 -c wrappers.c -O1 -fPIC \
     -I../symqemu/include/ \
     -I../symqemu/ \
     `pkg-config --cflags glib-2.0` \

@@ -34,7 +34,6 @@ RUN groupadd --gid 1008 ubuntu && \
 
 RUN mkdir /debug-ce
 RUN chown -R ubuntu:ubuntu /debug-ce
-COPY --chown=ubuntu:ubuntu config.h /debug-ce/config.h
 USER ubuntu
 
 # install GEF
@@ -61,6 +60,8 @@ RUN sudo rm /debug-ce/z3/build || echo "Nothing to clean"
 RUN mkdir /debug-ce/z3/build
 WORKDIR /debug-ce/z3/build
 RUN cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=`pwd`/dist && make -j `nproc` && make install
+
+COPY --chown=ubuntu:ubuntu config.h /debug-ce/config.h
 
 # Build SymCC (simple backend)
 COPY --chown=ubuntu:ubuntu symcc /debug-ce/symcc/ 
@@ -123,13 +124,16 @@ RUN ./configure                                                     \
     --symcc-source=/debug-ce/symcc/                                 \
     --symcc-build=/debug-ce/symcc/build &&                          \
     make -j `nproc`
+
 # build symhelpers
 COPY --chown=ubuntu:ubuntu symhelpers /debug-ce/symhelpers/
 RUN sudo rm -rf /debug-ce/symhelpers/*.so || echo "Nothing to remove" 
 WORKDIR /debug-ce/symhelpers/
-RUN if [ "$ENV" = "symhelpers" ] ; then ./build.sh
+RUN ./build.sh
+
 # rebuild SymQEMU with symhelpers
-RUN if [ "$ENV" = "symhelpers" ] ; then ./configure                \
+WORKDIR /debug-ce/symqemu/
+RUN ./configure                                                     \
     --audio-drv-list=                                               \
     --disable-bluez                                                 \
     --disable-sdl                                                   \

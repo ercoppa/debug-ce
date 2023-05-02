@@ -24,5 +24,9 @@
 #define SYMQEMU_FIX_CTZ_CLZ     0
 #define SYMQEMU_FIX_LOAD_SEXT   0
 #define SYMQEMU_FIX_SETCOND     0
+#define SYMQEMU_FIX_SYMHELPERS  0
+
+#define FUZZOLIC_FIX_XMM_REG_ACCESS 0
+#define FUZZOLIC_FIX_PUNPCK         0
 
 #endif
