@@ -85,7 +85,7 @@ where:
 ```
 $ docker run -ti --cap-add SYS_ADMIN --rm -w /debug-ce --name debug-ce-run-`date "+%y%m%d-%H%M"` bash
 $ cd tests/benchmarks
-$ ./rebuild-all.sh # build programs
+$ ./rebuild.sh # build programs
 $ ./run.py -t <tool> -s real <check strategy> <program>
 ```
 where:
