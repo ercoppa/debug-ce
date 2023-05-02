@@ -23,7 +23,7 @@ mv binutils-2.34 src
 
 source ${SCRIPTPATH}/../../source-symcc.sh
 build "symcc"
-exit 0
+# exit 0
 source ${SCRIPTPATH}/../../source-native.sh
 build "symqemu"
 cp ${BINARY}.symqemu ${BINARY}.fuzzolic
