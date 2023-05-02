@@ -1,4 +1,4 @@
-# Debugging Concolic Execution
+# Testing Concolic Execution Through Consistency Checks
 
 ## Fetch this repository
 ```
