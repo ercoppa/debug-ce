@@ -31,7 +31,7 @@ cd runner && docker build -t ercoppa/debug-ce -f ./Dockerfile ../
 ```
 
 ## Runner script
-We devised a script `run.py` in `tests/` for launching the experiments which has the following syntax:
+We devised a script `run.py` in `tests/` for launching the experiments. The script has the following syntax:
 ```
 $ ./run.py --help
 usage: run.py [-h] [-n] [-e] [-f] [-o {eval,smt}] [-p {eval,smt}] [-i] [-c] [-w WORKDIR] [-b] [-g] -t {symcc,symqemu,fuzzolic} -s {simple,real} <program>
